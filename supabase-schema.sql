@@ -213,6 +213,8 @@ create policy "al_owner" on activity_logs
 -- Profile RLS policies
 create policy "profiles_viewable_by_user" on profiles
   for select using (auth.uid() = user_id);
+create policy "profiles_insertable_by_user" on profiles
+  for insert with check (auth.uid() = user_id);
 create policy "profiles_updatable_by_user" on profiles
   for update using (auth.uid() = user_id);
 

@@ -92,6 +92,10 @@ h1, h2, h3, h4, h5, h6 {
   transition: all 0.2s;
 }
 
+.input.pl-10 {
+  padding-left: 2.5rem;
+}
+
 .input::placeholder {
   color: rgb(156 163 175);
 }
