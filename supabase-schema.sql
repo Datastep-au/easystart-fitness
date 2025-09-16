@@ -13,13 +13,22 @@ create table if not exists profiles (
 
 -- Create trigger function for new user profiles
 create or replace function handle_new_user()
-returns trigger as $$
+returns trigger 
+security definer -- This allows the function to bypass RLS
+as $$
 begin
-  insert into profiles (user_id, display_name)
-  values (new.id, coalesce(new.raw_user_meta_data->>'name',''));
+  insert into public.profiles (user_id, display_name)
+  values (
+    new.id, 
+    coalesce(new.raw_user_meta_data->>'name', '')
+  );
+  return new;
+exception when others then
+  -- Log the error but don't fail the user creation
+  raise warning 'Failed to create profile for user %: %', new.id, sqlerrm;
   return new;
 end;
-$$ language plpgsql security definer;
+$$ language plpgsql;
 
 -- Create trigger for new users
 drop trigger if exists on_auth_user_created on auth.users;
@@ -211,12 +220,15 @@ create policy "al_owner" on activity_logs
   with check (user_id = auth.uid());
 
 -- Profile RLS policies
-create policy "profiles_viewable_by_user" on profiles
+create policy "profiles_select_own" on profiles
   for select using (auth.uid() = user_id);
-create policy "profiles_insertable_by_user" on profiles
+create policy "profiles_insert_own" on profiles
   for insert with check (auth.uid() = user_id);
-create policy "profiles_updatable_by_user" on profiles
+create policy "profiles_update_own" on profiles
   for update using (auth.uid() = user_id);
+-- Allow service role to insert profiles via trigger
+create policy "profiles_insert_service_role" on profiles
+  for insert with check (true);
 
 -- Insert seed data for exercises
 insert into exercises (pillar, name, cues, regress, progress, default_reps, default_rest_sec, is_public, created_by) values
