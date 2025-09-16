@@ -14,7 +14,7 @@ import { trimToTimeBudget, getRecommendedTimeSplits } from './timeBudget'
 import { estimateBlockDuration, estimateTemplateDuration, estimateIntervalDuration } from './estimates'
 
 /**
- * Main function to build a personalized program
+ * Main function to build a personalized program with AI-powered recommendations
  */
 export function buildPersonalizedProgram(
   preferences: Preferences, 
@@ -48,7 +48,7 @@ export function buildPersonalizedProgram(
   // Generate week themes
   const weeks = generateWeekThemes(actualWeekLength)
   
-  // Generate daily schedules
+  // Generate daily schedules with intelligent pillar distribution
   const days = generateDailySchedules({
     weeks: weeks.length,
     daysPerWeek: actualDaysPerWeek,
@@ -58,7 +58,8 @@ export function buildPersonalizedProgram(
     pillars: pillars as Pillar[],
     primaryFocus: primary_focus as Pillar,
     equipment: equipment as Record<string, boolean>,
-    library
+    library,
+    preferences // Pass full preferences for smarter decisions
   })
 
   return {
@@ -106,12 +107,13 @@ function generateDailySchedules(options: {
   primaryFocus?: Pillar
   equipment: Record<string, boolean>
   library: ProgramGenerationOptions['library']
+  preferences?: Preferences
 }) {
   const days = []
   const { weeks, daysPerWeek, maxDuration, mode, fitnessLevel, pillars, primaryFocus, library } = options
 
-  // Define weekly schedule template based on days per week
-  const scheduleTemplates = getScheduleTemplate(daysPerWeek, pillars, primaryFocus)
+  // Define weekly schedule template based on days per week and preferences
+  const scheduleTemplates = getIntelligentScheduleTemplate(daysPerWeek, pillars, primaryFocus, options.preferences)
 
   for (let week = 1; week <= weeks; week++) {
     const weekTheme = getWeekTheme(week)
@@ -158,63 +160,136 @@ function generateDailySchedules(options: {
 }
 
 /**
- * Get schedule template based on days per week
+ * Get intelligent schedule template based on user preferences and AI recommendations
  */
-function getScheduleTemplate(daysPerWeek: number, pillars: Pillar[], primaryFocus?: Pillar): Pillar[][] {
-  const templates: Record<number, Pillar[][]> = {
-    3: [
-      ['strength', 'mobility'],
-      ['running', 'tai_chi'],
-      ['strength', 'mobility']
-    ],
-    4: [
-      ['strength', 'mobility'],
-      ['running', 'tai_chi'], 
-      ['mobility', 'tai_chi'],
-      ['strength', 'cardio']
-    ],
-    5: [
-      ['strength', 'mobility'],
-      ['running', 'tai_chi'],
-      ['mobility', 'tai_chi'],
-      ['cardio', 'strength'],
-      ['strength', 'mobility']
-    ],
-    6: [
-      ['strength', 'mobility'],
-      ['running', 'tai_chi'],
-      ['mobility', 'tai_chi'],
-      ['cardio', 'strength'],
-      ['strength', 'mobility'],
-      ['running', 'tai_chi']
-    ]
-  }
-
-  let template = templates[daysPerWeek] || templates[5]
+function getIntelligentScheduleTemplate(
+  daysPerWeek: number, 
+  pillars: Pillar[], 
+  primaryFocus?: Pillar,
+  preferences?: Preferences
+): Pillar[][] {
+  // Create balanced schedule based on selected pillars
+  const template: Pillar[][] = []
   
-  // Filter template to only include selected pillars
-  template = template.map(day => day.filter(pillar => pillars.includes(pillar)))
+  // Calculate optimal distribution of pillars across days
+  const pillarFrequency = calculatePillarFrequency(pillars, daysPerWeek, primaryFocus)
   
-  // Ensure primary focus appears more frequently if specified
-  if (primaryFocus && pillars.includes(primaryFocus)) {
-    template = enhancePrimaryFocus(template, primaryFocus)
+  // Generate daily combinations with intelligent pairing
+  for (let day = 0; day < daysPerWeek; day++) {
+    const dayPillars = selectOptimalPillarsForDay(day, pillars, pillarFrequency, preferences)
+    template.push(dayPillars)
   }
-
-  return template
+  
+  return optimizeScheduleBalance(template, pillars, primaryFocus)
 }
 
 /**
- * Enhance template to prioritize primary focus
+ * Calculate how frequently each pillar should appear per week
  */
-function enhancePrimaryFocus(template: Pillar[][], primaryFocus: Pillar): Pillar[][] {
-  return template.map((day, index) => {
-    // Add primary focus to alternating days if not already present
-    if (index % 2 === 0 && !day.includes(primaryFocus)) {
-      return [primaryFocus, ...day.slice(0, -1)] // Replace last pillar with primary focus
-    }
-    return day
+function calculatePillarFrequency(
+  pillars: Pillar[], 
+  daysPerWeek: number, 
+  primaryFocus?: Pillar
+): Record<Pillar, number> {
+  const frequency: Record<string, number> = {}
+  const baseSlotsPerDay = 2 // Most days have 2 pillars
+  const totalSlots = daysPerWeek * baseSlotsPerDay
+  
+  // Base frequency for each pillar
+  pillars.forEach(pillar => {
+    frequency[pillar] = Math.floor(totalSlots / pillars.length)
   })
+  
+  // Boost primary focus frequency
+  if (primaryFocus && pillars.includes(primaryFocus)) {
+    frequency[primaryFocus] = Math.ceil(frequency[primaryFocus] * 1.5)
+  }
+  
+  // Ensure mobility appears frequently for beginners
+  if (pillars.includes('mobility')) {
+    frequency['mobility'] = Math.max(frequency['mobility'], Math.ceil(daysPerWeek * 0.6))
+  }
+  
+  return frequency as Record<Pillar, number>
 }
+
+/**
+ * Select optimal pillars for a specific day with intelligent pairing
+ */
+function selectOptimalPillarsForDay(
+  dayIndex: number,
+  pillars: Pillar[],
+  frequency: Record<Pillar, number>,
+  preferences?: Preferences
+): Pillar[] {
+  const dayPillars: Pillar[] = []
+  const maxPillarsPerDay = preferences?.max_duration_min && preferences.max_duration_min <= 20 ? 1 : 2
+  
+  // Intelligent pillar pairing rules
+  const goodCombos: Record<Pillar, Pillar[]> = {
+    strength: ['mobility', 'tai_chi'],
+    mobility: ['strength', 'tai_chi', 'cardio'],
+    tai_chi: ['mobility', 'strength'],
+    running: ['mobility', 'tai_chi'],
+    cardio: ['mobility', 'tai_chi', 'strength']
+  }
+  
+  // Select primary pillar for the day
+  const availablePrimary = pillars.filter(p => frequency[p] > 0)
+  if (availablePrimary.length > 0) {
+    const primary = availablePrimary[dayIndex % availablePrimary.length]
+    dayPillars.push(primary)
+    frequency[primary]--
+  }
+  
+  // Select complementary pillar if space allows
+  if (dayPillars.length < maxPillarsPerDay && dayPillars[0]) {
+    const primaryPillar = dayPillars[0]
+    const complementary = goodCombos[primaryPillar]?.find(p => 
+      pillars.includes(p) && frequency[p] > 0 && !dayPillars.includes(p)
+    )
+    
+    if (complementary) {
+      dayPillars.push(complementary)
+      frequency[complementary]--
+    }
+  }
+  
+  return dayPillars
+}
+
+/**
+ * Optimize overall schedule balance
+ */
+function optimizeScheduleBalance(
+  template: Pillar[][],
+  pillars: Pillar[],
+  _primaryFocus?: Pillar
+): Pillar[][] {
+  // Ensure no pillar is completely missing
+  const pillarCounts: Record<string, number> = {}
+  pillars.forEach(p => pillarCounts[p] = 0)
+  
+  template.forEach(day => {
+    day.forEach(pillar => pillarCounts[pillar]++)
+  })
+  
+  // Add missing pillars to days with space
+  pillars.forEach(pillar => {
+    if (pillarCounts[pillar] === 0) {
+      // Find a day with space and add this pillar
+      for (let i = 0; i < template.length; i++) {
+        if (template[i].length < 2) {
+          template[i].push(pillar)
+          break
+        }
+      }
+    }
+  })
+  
+  return template
+}
+
 
 /**
  * Get theme characteristics for a week

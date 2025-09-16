@@ -105,16 +105,16 @@ const OnboardingPage: React.FC = () => {
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Program Duration
                 </label>
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   {[10, 11, 12].map(weeks => (
                     <button
                       key={weeks}
                       type="button"
                       onClick={() => setFormData(prev => ({ ...prev, week_length: weeks }))}
-                      className={`p-3 rounded-lg border-2 transition-colors ${
+                    className={`p-3 rounded-lg border-2 transition-all duration-200 ${
                         formData.week_length === weeks
-                          ? 'border-blue-500 bg-blue-50 text-blue-700 dark:bg-blue-900 dark:text-blue-300'
-                          : 'border-gray-300 hover:border-gray-400 dark:border-gray-600'
+                          ? 'border-blue-500 bg-blue-500 text-white shadow-lg transform scale-105'
+                          : 'border-gray-300 hover:border-blue-300 hover:bg-blue-50 dark:border-gray-600'
                       }`}
                     >
                       <div className="font-semibold">{weeks} weeks</div>
@@ -130,16 +130,16 @@ const OnboardingPage: React.FC = () => {
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Days per Week
                 </label>
-                <div className="grid grid-cols-4 gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   {[3, 4, 5, 6].map(days => (
                     <button
                       key={days}
                       type="button"
                       onClick={() => setFormData(prev => ({ ...prev, days_per_week: days }))}
-                      className={`p-3 rounded-lg border-2 transition-colors ${
+                      className={`p-3 rounded-lg border-2 transition-all duration-200 ${
                         formData.days_per_week === days
-                          ? 'border-blue-500 bg-blue-50 text-blue-700 dark:bg-blue-900 dark:text-blue-300'
-                          : 'border-gray-300 hover:border-gray-400 dark:border-gray-600'
+                          ? 'border-blue-500 bg-blue-500 text-white shadow-lg transform scale-105'
+                          : 'border-gray-300 hover:border-blue-300 hover:bg-blue-50 dark:border-gray-600'
                       }`}
                     >
                       <div className="font-semibold">{days} days</div>
@@ -168,16 +168,16 @@ const OnboardingPage: React.FC = () => {
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Maximum Session Duration
                 </label>
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   {[15, 30, 45].map(duration => (
                     <button
                       key={duration}
                       type="button"
                       onClick={() => setFormData(prev => ({ ...prev, max_duration_min: duration }))}
-                      className={`p-3 rounded-lg border-2 transition-colors ${
+                      className={`p-3 rounded-lg border-2 transition-all duration-200 ${
                         formData.max_duration_min === duration
-                          ? 'border-blue-500 bg-blue-50 text-blue-700 dark:bg-blue-900 dark:text-blue-300'
-                          : 'border-gray-300 hover:border-gray-400 dark:border-gray-600'
+                          ? 'border-blue-500 bg-blue-500 text-white shadow-lg transform scale-105'
+                          : 'border-gray-300 hover:border-blue-300 hover:bg-blue-50 dark:border-gray-600'
                       }`}
                     >
                       <div className="font-semibold">{duration} min</div>
@@ -193,7 +193,7 @@ const OnboardingPage: React.FC = () => {
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Default Mode
                 </label>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {[
                     { value: 'short' as Mode, label: 'Short Sessions', desc: '20min focused workouts' },
                     { value: 'full' as Mode, label: 'Full Sessions', desc: 'Complete workout experience' }
@@ -202,10 +202,10 @@ const OnboardingPage: React.FC = () => {
                       key={mode.value}
                       type="button"
                       onClick={() => setFormData(prev => ({ ...prev, default_mode: mode.value }))}
-                      className={`p-3 rounded-lg border-2 transition-colors ${
+                      className={`p-3 rounded-lg border-2 transition-all duration-200 ${
                         formData.default_mode === mode.value
-                          ? 'border-blue-500 bg-blue-50 text-blue-700 dark:bg-blue-900 dark:text-blue-300'
-                          : 'border-gray-300 hover:border-gray-400 dark:border-gray-600'
+                          ? 'border-blue-500 bg-blue-500 text-white shadow-lg transform scale-105'
+                          : 'border-gray-300 hover:border-blue-300 hover:bg-blue-50 dark:border-gray-600'
                       }`}
                     >
                       <div className="font-semibold">{mode.label}</div>
@@ -240,10 +240,10 @@ const OnboardingPage: React.FC = () => {
                   key={level.value}
                   type="button"
                   onClick={() => setFormData(prev => ({ ...prev, fitness_level: level.value }))}
-                  className={`w-full p-4 rounded-lg border-2 transition-colors text-left ${
+                  className={`w-full p-4 rounded-lg border-2 transition-all duration-200 text-left ${
                     formData.fitness_level === level.value
-                      ? 'border-blue-500 bg-blue-50 text-blue-700 dark:bg-blue-900 dark:text-blue-300'
-                      : 'border-gray-300 hover:border-gray-400 dark:border-gray-600'
+                      ? 'border-blue-500 bg-blue-500 text-white shadow-lg transform scale-[1.02]'
+                      : 'border-gray-300 hover:border-blue-300 hover:bg-blue-50 dark:border-gray-600'
                   }`}
                 >
                   <div className="font-semibold">{level.label}</div>
@@ -262,7 +262,7 @@ const OnboardingPage: React.FC = () => {
                 Fitness Pillars
               </h2>
               <p className="text-gray-600 dark:text-gray-400">
-                Which areas would you like to focus on?
+                Select multiple areas you'd like to focus on (you can choose more than one)
               </p>
             </div>
             
@@ -293,10 +293,10 @@ const OnboardingPage: React.FC = () => {
                         }))
                       }
                     }}
-                    className={`w-full p-4 rounded-lg border-2 transition-colors text-left ${
+                    className={`w-full p-4 rounded-lg border-2 transition-all duration-200 text-left cursor-pointer ${
                       formData.pillars.includes(pillar.value)
-                        ? 'border-blue-500 bg-blue-50 text-blue-700 dark:bg-blue-900 dark:text-blue-300'
-                        : 'border-gray-300 hover:border-gray-400 dark:border-gray-600'
+                        ? 'border-green-500 bg-green-500 text-white shadow-lg'
+                        : 'border-gray-300 hover:border-blue-300 hover:bg-blue-50 dark:border-gray-600 hover:shadow-md'
                     }`}
                   >
                     <div className="flex items-center justify-between">
@@ -305,7 +305,7 @@ const OnboardingPage: React.FC = () => {
                         <div className="text-sm text-gray-600 dark:text-gray-400">{pillar.desc}</div>
                       </div>
                       {formData.pillars.includes(pillar.value) && (
-                        <Check className="h-5 w-5 text-blue-600" />
+                        <Check className="h-6 w-6 text-white font-bold" />
                       )}
                     </div>
                   </button>
@@ -317,16 +317,16 @@ const OnboardingPage: React.FC = () => {
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Primary Focus (Optional)
                   </label>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {formData.pillars.map(pillar => (
                       <button
                         key={pillar}
                         type="button"
                         onClick={() => setFormData(prev => ({ ...prev, primary_focus: pillar }))}
-                        className={`p-3 rounded-lg border-2 transition-colors ${
+                        className={`p-3 rounded-lg border-2 transition-all duration-200 ${
                           formData.primary_focus === pillar
-                            ? 'border-blue-500 bg-blue-50 text-blue-700 dark:bg-blue-900 dark:text-blue-300'
-                            : 'border-gray-300 hover:border-gray-400 dark:border-gray-600'
+                            ? 'border-blue-500 bg-blue-500 text-white shadow-lg transform scale-105'
+                            : 'border-gray-300 hover:border-blue-300 hover:bg-blue-50 dark:border-gray-600'
                         }`}
                       >
                         <div className="font-semibold capitalize">{pillar.replace('_', ' ')}</div>
@@ -351,7 +351,7 @@ const OnboardingPage: React.FC = () => {
               </p>
             </div>
             
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {[
                 { key: 'yoga_mat', label: 'Yoga Mat', desc: 'For floor exercises' },
                 { key: 'bands', label: 'Resistance Bands', desc: 'Elastic bands for resistance' },
@@ -372,10 +372,10 @@ const OnboardingPage: React.FC = () => {
                       }
                     }))
                   }}
-                  className={`p-3 rounded-lg border-2 transition-colors text-left ${
+                  className={`p-3 rounded-lg border-2 transition-all duration-200 text-left cursor-pointer ${
                     formData.equipment[equipment.key as keyof typeof formData.equipment]
-                      ? 'border-blue-500 bg-blue-50 text-blue-700 dark:bg-blue-900 dark:text-blue-300'
-                      : 'border-gray-300 hover:border-gray-400 dark:border-gray-600'
+                      ? 'border-green-500 bg-green-500 text-white shadow-lg'
+                      : 'border-gray-300 hover:border-blue-300 hover:bg-blue-50 dark:border-gray-600 hover:shadow-md'
                   }`}
                 >
                   <div className="flex items-center justify-between">
@@ -384,7 +384,7 @@ const OnboardingPage: React.FC = () => {
                       <div className="text-sm text-gray-600 dark:text-gray-400">{equipment.desc}</div>
                     </div>
                     {formData.equipment[equipment.key as keyof typeof formData.equipment] && (
-                      <Check className="h-5 w-5 text-blue-600" />
+                      <Check className="h-6 w-6 text-white font-bold" />
                     )}
                   </div>
                 </button>
@@ -399,11 +399,11 @@ const OnboardingPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">
-      <div className="max-w-2xl w-full space-y-8">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 p-2 sm:p-4">
+      <div className="max-w-2xl w-full space-y-6 sm:space-y-8">
         {/* Progress Bar */}
-        <div className="flex items-center justify-between mb-8">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 sm:mb-8">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2 sm:mb-0">
             Let's Get You Started! 💪
           </h1>
           <div className="text-sm text-gray-600 dark:text-gray-400">
@@ -419,17 +419,17 @@ const OnboardingPage: React.FC = () => {
         </div>
         
         {/* Step Content */}
-        <div className="card p-8">
+        <div className="card p-4 sm:p-6 lg:p-8">
           {renderStep()}
         </div>
         
         {/* Navigation */}
-        <div className="flex justify-between">
+        <div className="flex flex-col sm:flex-row justify-between gap-3 sm:gap-0">
           <Button
             variant="outline"
             onClick={handleBack}
             disabled={currentStep === 1}
-            className="flex items-center"
+            className="flex items-center justify-center order-2 sm:order-1"
           >
             <ChevronLeft className="h-4 w-4 mr-1" />
             Back
@@ -439,7 +439,7 @@ const OnboardingPage: React.FC = () => {
             <Button
               onClick={handleNext}
               disabled={!canProceed()}
-              className="flex items-center"
+              className="flex items-center justify-center order-1 sm:order-2"
             >
               Next
               <ChevronRight className="h-4 w-4 ml-1" />
@@ -449,7 +449,7 @@ const OnboardingPage: React.FC = () => {
               onClick={handleComplete}
               disabled={!canProceed()}
               loading={loading}
-              className="flex items-center"
+              className="flex items-center justify-center order-1 sm:order-2"
             >
               Complete Setup
               <Check className="h-4 w-4 ml-1" />
