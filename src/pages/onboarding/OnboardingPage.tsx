@@ -46,6 +46,7 @@ const OnboardingPage: React.FC = () => {
   const handleComplete = async () => {
     try {
       setLoading(true)
+      console.log('Completing onboarding with data:', formData)
       
       // Save preferences to database
       const preferences = {
@@ -59,15 +60,19 @@ const OnboardingPage: React.FC = () => {
         equipment: formData.equipment
       }
       
+      console.log('Saving preferences:', preferences)
       await updatePreferences(preferences)
       
+      console.log('Generating program...')
       // Generate initial program
       await generateProgram(preferences as any)
       
+      console.log('Navigating to today page')
       // Navigate to main app
       navigate('/today')
     } catch (error) {
       console.error('Onboarding error:', error)
+      alert('Error completing setup: ' + error)
       // Still navigate to avoid blocking user
       navigate('/today')
     } finally {
@@ -110,7 +115,11 @@ const OnboardingPage: React.FC = () => {
                     <button
                       key={weeks}
                       type="button"
-                      onClick={() => setFormData(prev => ({ ...prev, week_length: weeks }))}
+                      onClick={() => {
+                        console.log('Selecting week length:', weeks)
+                        setFormData(prev => ({ ...prev, week_length: weeks }))
+                        console.log('Updated formData.week_length to:', weeks)
+                      }}
                     className={`p-3 rounded-lg border-2 transition-all duration-200 ${
                         formData.week_length === weeks
                           ? 'border-blue-500 bg-blue-500 text-white shadow-lg transform scale-105'
@@ -279,14 +288,18 @@ const OnboardingPage: React.FC = () => {
                     key={pillar.value}
                     type="button"
                     onClick={() => {
+                      console.log('Pillar click:', pillar.value)
                       const isSelected = formData.pillars.includes(pillar.value)
+                      console.log('Currently selected:', isSelected, 'Current pillars:', formData.pillars)
                       if (isSelected) {
+                        console.log('Removing pillar:', pillar.value)
                         setFormData(prev => ({
                           ...prev,
                           pillars: prev.pillars.filter(p => p !== pillar.value),
                           primary_focus: prev.primary_focus === pillar.value ? undefined : prev.primary_focus
                         }))
                       } else {
+                        console.log('Adding pillar:', pillar.value)
                         setFormData(prev => ({
                           ...prev,
                           pillars: [...prev.pillars, pillar.value]

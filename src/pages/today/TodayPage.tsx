@@ -1,18 +1,91 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useAppStore } from '../../store'
 import { Calendar, Clock, Zap } from 'lucide-react'
+import Button from '../../components/ui/Button'
 
 const TodayPage: React.FC = () => {
+  const navigate = useNavigate()
+  const { 
+    user, 
+    currentProgram, 
+    currentWeek, 
+    preferences, 
+    loadCurrentProgram, 
+    loadPreferences,
+    getTodaysWorkout
+  } = useAppStore()
+  
+  const [loading, setLoading] = useState(true)
+  const [currentMode, setCurrentMode] = useState<'short' | 'full'>('full')
+  
   const today = new Date().toLocaleDateString('en-US', {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
     day: 'numeric'
   })
+  
+  const todaysWorkout = getTodaysWorkout()
+  
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        await Promise.all([
+          loadCurrentProgram(),
+          loadPreferences()
+        ])
+      } catch (error) {
+        console.error('Error loading today data:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    
+    if (user) {
+      loadData()
+    } else {
+      setLoading(false)
+    }
+  }, [user, loadCurrentProgram, loadPreferences])
 
+  // Handle no program case
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-64">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-400">Loading your workout...</p>
+        </div>
+      </div>
+    )
+  }
+  
+  if (!currentProgram || !todaysWorkout) {
+    return (
+      <div className="space-y-6">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+            Welcome to EasyStart Fitness! 👋
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400 mb-8">
+            You don't have a workout program yet. Complete the setup to get your personalized plan!
+          </p>
+          <Button 
+            onClick={() => navigate('/onboarding')}
+            className="px-8 py-3"
+          >
+            Start Setup 🚀
+          </Button>
+        </div>
+      </div>
+    )
+  }
+  
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
             Today's Workout
@@ -22,7 +95,9 @@ const TodayPage: React.FC = () => {
         
         <div className="flex items-center space-x-2">
           <Calendar className="h-5 w-5 text-gray-500" />
-          <span className="text-sm text-gray-600 dark:text-gray-400">Week 1, Day 1</span>
+          <span className="text-sm text-gray-600 dark:text-gray-400">
+            Week {currentWeek}, Day {todaysWorkout.day_of_week}
+          </span>
         </div>
       </div>
 
@@ -30,10 +105,12 @@ const TodayPage: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="card p-4">
           <div className="flex items-center">
-            <Clock className="h-8 w-8 text-primary-600" />
+            <Clock className="h-8 w-8 text-blue-600" />
             <div className="ml-3">
               <p className="text-sm text-gray-600 dark:text-gray-400">Estimated Time</p>
-              <p className="text-lg font-semibold text-gray-900 dark:text-white">45 min</p>
+              <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                {todaysWorkout.est_total_min || preferences?.max_duration_min || 30} min
+              </p>
             </div>
           </div>
         </div>
@@ -43,7 +120,9 @@ const TodayPage: React.FC = () => {
             <Zap className="h-8 w-8 text-orange-600" />
             <div className="ml-3">
               <p className="text-sm text-gray-600 dark:text-gray-400">Intensity</p>
-              <p className="text-lg font-semibold text-gray-900 dark:text-white">Beginner</p>
+              <p className="text-lg font-semibold text-gray-900 dark:text-white capitalize">
+                {preferences?.fitness_level || 'Beginner'}
+              </p>
             </div>
           </div>
         </div>
@@ -51,7 +130,9 @@ const TodayPage: React.FC = () => {
         <div className="card p-4">
           <div className="flex items-center">
             <div className="h-8 w-8 bg-green-100 rounded-full flex items-center justify-center">
-              <span className="text-green-600 font-bold">3</span>
+              <span className="text-green-600 font-bold">
+                {(todaysWorkout.blocks as any[])?.length || 0}
+              </span>
             </div>
             <div className="ml-3">
               <p className="text-sm text-gray-600 dark:text-gray-400">Blocks</p>
@@ -63,7 +144,7 @@ const TodayPage: React.FC = () => {
 
       {/* Mode Toggle */}
       <div className="card p-6">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
             <h3 className="text-lg font-medium text-gray-900 dark:text-white">
               Workout Mode
@@ -74,10 +155,24 @@ const TodayPage: React.FC = () => {
           </div>
           
           <div className="flex bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
-            <button className="px-4 py-2 text-sm font-medium bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md shadow-sm">
-              Full (45min)
+            <button 
+              onClick={() => setCurrentMode('full')}
+              className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                currentMode === 'full' 
+                  ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
+                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
+              }`}
+            >
+              Full ({preferences?.max_duration_min || 30}min)
             </button>
-            <button className="px-4 py-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">
+            <button 
+              onClick={() => setCurrentMode('short')}
+              className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                currentMode === 'short'
+                  ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
+                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
+              }`}
+            >
               Short (20min)
             </button>
           </div>
