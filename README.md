@@ -1,5 +1,9 @@
 # EasyStart Fitness
 
+[![Deploy to GitHub Pages](https://github.com/Datastep-au/easystart-fitness/actions/workflows/deploy.yml/badge.svg)](https://github.com/Datastep-au/easystart-fitness/actions/workflows/deploy.yml)
+
+🚀 **[Live Demo](https://datastep-au.github.io/easystart-fitness/)** | 📖 **[Documentation](#quick-start)** | 🔧 **[Setup Guide](#2-set-up-supabase)**
+
 A local-first Progressive Web App (PWA) built with React, TypeScript, Vite, and TailwindCSS, integrated with Supabase for backend services. EasyStart Fitness generates personalized 10–12 week fitness programs for complete beginners, featuring five core pillars: Strength, Tai Chi, Running, Mobility, and Cardio.
 
 ## ✨ Features
