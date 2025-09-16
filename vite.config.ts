@@ -17,8 +17,8 @@ export default defineConfig({
         theme_color: '#0ea5e9',
         background_color: '#ffffff',
         display: 'standalone',
-        scope: '/',
-        start_url: '/',
+        scope: process.env.NODE_ENV === 'production' ? '/easystart-fitness/' : '/',
+        start_url: process.env.NODE_ENV === 'production' ? '/easystart-fitness/' : '/',
         orientation: 'portrait',
         categories: ['health', 'fitness', 'lifestyle'],
         icons: [

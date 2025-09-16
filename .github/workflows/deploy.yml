@@ -34,7 +34,9 @@ jobs:
         
       - name: Build project
         run: npm run build
-        # Uses demo environment variables from .env for GitHub Pages demo
+        env:
+          VITE_SUPABASE_URL: https://hzslclenaekvmebzoqio.supabase.co
+          VITE_SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh6c2xjbGVuYWVrdm1lYnpvcWlvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc5MTIwOTAsImV4cCI6MjA3MzQ4ODA5MH0.3_9EiOw_O5nj9hdgg833DZHlC78Ticyrj62qHmpeVYo
         
       - name: Setup Pages
         uses: actions/configure-pages@v4
